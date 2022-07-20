@@ -5,15 +5,24 @@ import pandas as pd
 import time
 import os
 import collections
-# 1.use integer in tensor slice
-data = np.random.rand(2000000)
+import random
+CONTINUOUS_COLUMNS = ['I' + str(i) for i in range(1, 14)]  # 1-13 inclusive
+CATEGORICAL_COLUMNS = ['C' + str(i) for i in range(1, 27)]  # 1-26 inclusive
+LABEL_COLUMN = ['clicked']
+TRAIN_DATA_COLUMNS = LABEL_COLUMN + CONTINUOUS_COLUMNS + CATEGORICAL_COLUMNS
+FEATURE_COLUMNS = CONTINUOUS_COLUMNS + CATEGORICAL_COLUMNS
+def getData():
+    index = []
+    for i in range(0,2000000):
+        index.append(random.randint(0,10000))
+    data = np.array(index)
+    return data
+features = collections.OrderedDict()
+for col in FEATURE_COLUMNS:
+    features[col] = getData()
+labels = np.random.rand(2000000)
 start = time.time()
-# 2.use string in tensor slice, is much slower than integer
-# index = []
-# for i in range(0,2000000):
-#     index.append('aaaaaaa')
-# data = np.array(index)
-dataset = tf.data.Dataset.from_tensor_slices(tuple([data]*40))
+dataset = tf.data.Dataset.from_tensor_slices((features,labels))
 
 dataset = dataset.batch(100)
 dataset = dataset.prefetch(2)
